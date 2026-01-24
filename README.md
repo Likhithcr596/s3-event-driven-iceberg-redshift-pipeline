@@ -93,6 +93,14 @@ The pipeline listens for new data arrivals in S3, triggers processing through AW
 
 ---
 
+---
+
+## Flow Diagram
+
+<img width="1829" height="944" alt="image" src="https://github.com/user-attachments/assets/6093c2d4-0132-414a-be9e-016b06ea4535" />
+
+---
+
 ## Future Enhancements
 
 - Add data quality validations
