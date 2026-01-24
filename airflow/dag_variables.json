@@ -1,0 +1,17 @@
+{
+    "1pd_under_armour": {
+        "access_emails": "user1@omc.com,user2@omc.com",
+        "catalog": "glue_catalog",
+        "cc_emails": "auds@annalect.com",
+        "config_path": "s3://ann32auds-aue1-auds-datateam/scripts/ses_config/1pd_ses_common_config.cfg",
+        "dataset": "Under Armour",
+        "external_crossaccount_catalog_id": "801684805865",
+        "ice_dest_folder": "s3://ann34orad-aue1-cl-557c2aee-2644-11e5-8254-121cf53dff64/39b50272-7248-43c9-96d9-24c68b0da15e/data/auds/bronze",
+        "input_file_path": "s3://ann32auds-aue1-auds-sync-nonpii/incoming",
+        "internal_catalog_id": "125876603273",
+        "schema": "an_auds_39b50272-7248-43c9-96d9-24c68b0da15e_bronze",
+        "script_location": "s3://ann32auds-aue1-auds-datateam/scripts/1pd_under_armour/under_armour_load.py",
+        "table_names": "omd_under_armour_1pd_id_mapping_resolved,omd_under_armour_1pd_id_mapping_full,omd_under_armour_1pd_attributes_attribute_pull",
+        "to_emails": "auds@annalect.com"
+    }
+}
