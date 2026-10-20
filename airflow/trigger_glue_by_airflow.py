@@ -12,10 +12,6 @@ from airflow.sensors.time_delta import TimeDeltaSensor
 from airflow.utils.task_group import TaskGroup
 from airflow.models import Variable
 
-
-
-
-
 AWS_CONN_ID = 'aws_default'
 GLUE_ROLE = "test"
 dag_name = "dag_name"
@@ -37,13 +33,10 @@ cc_emails=dag_vars['cc_emails']
 
 exec_date = '{{ (next_execution_date.replace(day=20)).strftime("%Y-%m-%d") }}'
 
-# exec_date = "2025-11-04"
-
-
 
 GLUE_JOBS_CONFIG = [
     {
-        "job_name": "1pd_under_armour_job",
+        "job_name": "<client>_job",
         "script_location": script_location,
         "default_args": {
             "--TempDir": "s3://<bucket>/tmp/",
