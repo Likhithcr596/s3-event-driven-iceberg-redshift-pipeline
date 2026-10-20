@@ -220,8 +220,7 @@ def get_email_body_html(dataset, datafolder, schema, table_names, row_counts, ac
           <b>Incremental Row counts:</b><br>{''.join([f'{tbl}: {counts}<br>' for tbl, counts in row_counts.items()])}<br>
           <b>Access provided for:</b> {', '.join(access_emails)}<br><br>
           <b>Schema Changes:</b> {schema_changes}<br><br>
-          Thank you,<br>
-          Team AUDS
+          Thank you<br>
         </div>
       </body>
     </html>"""
@@ -242,8 +241,7 @@ Incremental Row counts: {row_counts}
 Access provided for: {', '.join(access_emails)}
 Schema Changes: {schema_changes}
 
-Thank you,
-Team AUDS
+Thank you
 """
 
 def send_refresh_email(dataset, refresh_date, datafolder, schema, table_names, 
@@ -302,29 +300,6 @@ def main_email(config_path, row_counts, latest_folders_dict, table_names, schema
         else:
             schema_changes_formatted += f"{tbl}: No<br>"
 
-    # SLA calculation logic
-    # Convert exec_date to date object if needed
-    # if isinstance(exec_date, str):
-    #     exec_dt = datetime.strptime(exec_date, "%Y-%m-%d").date()
-    # else:
-    #     exec_dt = exec_date
-    # if isinstance(max_source_date, str):
-    #     max_source_dt = datetime.strptime(max_source_date, "%Y-%m-%d").date()
-    # else:
-    #     max_source_dt = max_source_date
-
-    # delta = exec_dt - max_source_dt
-    # if delta.days < 1:
-    #     sla_status = "Met"
-    #     duration_hours = delta.total_seconds() / 3600
-    #     if duration_hours < 1:
-    #         duration_str = f"{int(duration_hours * 60)} minutes"
-    #     else:
-    #         duration_str = f"{duration_hours:.1f} hours"
-    # else:
-    #     sla_status = "Not Met"
-    #     duration_str = f"{delta.days} days"
-
     config_data = get_config(config_path)
 
     sender_email = config_data['sender_email']
@@ -361,10 +336,8 @@ def main_email(config_path, row_counts, latest_folders_dict, table_names, schema
 def main():
     args = getResolvedOptions(sys.argv, ["external_crossaccount_catalog_id","internal_catalog_id","table_names","schema","input_file_path","ice_dest_folder","catalog","dataset","access_emails","to_emails","cc_emails","exec_date","config_path","rd_src_schema","rd_dst_schema"])
 
-    # config_path = "s3://ann32auds-aue1-auds-datateam/scripts/test/1pd_ses_common_config.cfg"
-
-    external_crossaccount_catalog_id = args['external_crossaccount_catalog_id'] #"801684805865"
-    internal_catalog_id = args['internal_catalog_id'] #"125876603273"
+    external_crossaccount_catalog_id = args['external_crossaccount_catalog_id'] 
+    internal_catalog_id = args['internal_catalog_id'] 
     table_names = args['table_names'] 
     schema = args['schema']
     input_file_path = args['input_file_path']
@@ -377,11 +350,7 @@ def main():
     config_path = args['config_path']
     rd_src_schema = args['rd_src_schema']
     rd_dst_schema = args['rd_dst_schema']
-    
-    
 
-    # external_crossaccount_catalog_id = "801684805865"
-    # internal_catalog_id = "125876603273"
 
     spark = create_spark_session(
         external_crossaccount_catalog_id=external_crossaccount_catalog_id,
@@ -396,19 +365,6 @@ def main():
     host = creds.get("host", "").replace('"', '')
     port = creds.get("port", "").replace('"', '')
     database = creds.get("database", "").replace('"', '')
-
-    
-
-    # table_names = "omd_under_armour_1pd_id_mapping_resolved,omd_under_armour_1pd_id_mapping_full,omd_under_armour_1pd_attributes_attribute_pull"
-    # schema = "an_auds_39b50272-7248-43c9-96d9-24c68b0da15e_bronze"
-    # input_file_path = "s3://ann32auds-aue1-auds-sync-nonpii/incoming"
-    # ice_dest_folder = "s3://ann34orad-aue1-cl-557c2aee-2644-11e5-8254-121cf53dff64/39b50272-7248-43c9-96d9-24c68b0da15e/data/auds/bronze"
-    # catalog = "glue_catalog"
-    # dataset = "Under Armour"
-    # access_emails = "user1@omc.com,user2@omc.com"
-    # to_emails = "likhith.rajanna@omc.com,likhithcr15@gmail.com"
-    # cc_emails = "likhith.rajanna@omc.com,likhithcr15@gmail.com"
-    # exec_date = '2025-11-04'
 
     table_names = table_names.split(',')
     to_emails = to_emails.split(',')
@@ -477,7 +433,7 @@ def load_to_dsdk_redshift(rd_src_schema,table_name,rd_dst_schema,host,port,datab
     # WHERE dt = CAST('{date}' AS DATE)
     # """
     query = f"""
-    select * from auds_ib_public.omd_under_armour_1pd_attributes_attribute_pull limit 10;
+    select * from schema.table limit 10;
     """
     
 
