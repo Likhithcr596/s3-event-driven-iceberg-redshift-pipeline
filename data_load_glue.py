@@ -33,13 +33,13 @@ def get_config(conf_path):
 
 ###################################
 
-def create_spark_session(app_name="OLS_replication", external_crossaccount_catalog_id=None, internal_catalog_id=None, extra_configs=None):
+def create_spark_session(app_name="demo_iceberg_replication", external_demo_catalog_id=None, internal_demo_catalog_id=None, extra_configs=None):
     """
     Creates and returns a Spark session with predefined Iceberg and Glue catalog configurations.
     
     :param app_name: Name of the Spark application.
-    :param external_crossaccount_catalog_id: ID of the external cross-account Glue catalog.
-    :param internal_catalog_id: ID of the internal Glue catalog.
+    :param external_demo_catalog_id: ID of the external cross-account Glue catalog.
+    :param internal_demo_catalog_id: ID of the internal Glue catalog.
     :param extra_configs: Additional Spark configurations as a dictionary.
     :return: A configured SparkSession instance.
     """
@@ -64,8 +64,8 @@ def create_spark_session(app_name="OLS_replication", external_crossaccount_catal
     }
     # Cross-account catalog configurations
     crossaccount_conf = {
-        "spark.sql.catalog.glue_catalog.glue.id": external_crossaccount_catalog_id,
-        "spark.sql.catalog.int_catalog.glue.id": internal_catalog_id
+        "spark.sql.catalog.glue_catalog.glue.id": external_demo_catalog_id,
+        "spark.sql.catalog.int_catalog.glue.id": internal_demo_catalog_id
     }
     # Merge configurations
     all_configs = {**default_conf, **common_catalog_conf, **crossaccount_conf}   
@@ -140,7 +140,7 @@ def load_ice_data(spark,input_url,ice_dest_path,dst_table_full_name,table_name,r
     print('Iceberg data load started!!')
     print(input_url)
     src_folders = get_dir_list(input_url)
-    limit_dt = datetime.strptime('20250515','%Y%m%d').date()
+    limit_dt = datetime.strptime('20250101','%Y%m%d').date()
     print(src_folders)
     src_dt = [datetime.strptime(dir.split('=')[1][:-1], "%Y%m%d").date() for dir in src_folders]
     src_dt = [dt for dt in src_dt if dt > limit_dt]
@@ -188,8 +188,8 @@ def load_ice_data(spark,input_url,ice_dest_path,dst_table_full_name,table_name,r
         columns = df_iceberg.columns
         print(columns)
         #write_parquet_with_glue_table_iceberg(spark, df_iceberg, dst_table_full_name, partition_cols=['dt'])
-        #load_to_dsdk_redshift(dst_table_full_name,final_redshift_schema,table_name,host,port,database,user,password, dt)
-        load_to_dsdk_redshift(rd_src_schema,table_name,rd_dst_schema,host,port,database,user,password,dt)
+        #load_to_demo_warehouse(dst_table_full_name,demo_destination_schema,table_name,host,port,database,user,password, dt)
+        load_to_demo_warehouse(rd_src_schema,table_name,rd_dst_schema,host,port,database,user,password,dt)
     print('Iceberg data load completed!!')
     print("to_load_dt",latest_folders)
     return incremental_rows,latest_folders,schema_change_message,max_source_date
@@ -247,7 +247,7 @@ Thank you
 def send_refresh_email(dataset, refresh_date, datafolder, schema, table_names, 
                       row_counts, access_emails, schema_changes,
                       sender_email, to_emails, cc_emails, reply_to_email, source_arn, 
-                      aws_region="us-east-1"):
+                      aws_region="YOUR_AWS_REGION"):
     """
     Send a dataset refresh success email using AWS SES
     """
@@ -334,10 +334,10 @@ def main_email(config_path, row_counts, latest_folders_dict, table_names, schema
 
 
 def main():
-    args = getResolvedOptions(sys.argv, ["external_crossaccount_catalog_id","internal_catalog_id","table_names","schema","input_file_path","ice_dest_folder","catalog","dataset","access_emails","to_emails","cc_emails","exec_date","config_path","rd_src_schema","rd_dst_schema"])
+    args = getResolvedOptions(sys.argv, ["external_demo_catalog_id","internal_demo_catalog_id","table_names","schema","input_file_path","ice_dest_folder","catalog","dataset","access_emails","to_emails","cc_emails","exec_date","config_path","rd_src_schema","rd_dst_schema"])
 
-    external_crossaccount_catalog_id = args['external_crossaccount_catalog_id'] 
-    internal_catalog_id = args['internal_catalog_id'] 
+    external_demo_catalog_id = args['external_demo_catalog_id'] 
+    internal_demo_catalog_id = args['internal_demo_catalog_id'] 
     table_names = args['table_names'] 
     schema = args['schema']
     input_file_path = args['input_file_path']
@@ -353,13 +353,13 @@ def main():
 
 
     spark = create_spark_session(
-        external_crossaccount_catalog_id=external_crossaccount_catalog_id,
-        internal_catalog_id=internal_catalog_id
+        external_demo_catalog_id=external_demo_catalog_id,
+        internal_demo_catalog_id=internal_demo_catalog_id
     )
     
     #get creds from ssm
     ssm_config = get_ssm_params()
-    creds = ssm_config.get("auds_dsdk_connect", {})
+    creds = ssm_config.get("demo_warehouse_connect", {})
     user = creds.get("username", "").replace('"', '')
     password = creds.get("password", "").replace('"', '')
     host = creds.get("host", "").replace('"', '')
@@ -395,9 +395,9 @@ def get_ssm_params():
     The parameter value must be in .ini format, e.g.:
     """
 
-    client = boto3.client("ssm", region_name="us-east-1")
+    client = boto3.client("ssm", region_name="YOUR_AWS_REGION")
     response = client.get_parameter(
-        Name="/auds/service",
+        Name="/demo/service",
         WithDecryption=True
     )
     param_buf = io.StringIO(response['Parameter']['Value'])
@@ -412,12 +412,12 @@ def get_ssm_params():
 
 
 
-def load_to_dsdk_redshift(rd_src_schema,table_name,rd_dst_schema,host,port,database,user,password,date):
+def load_to_demo_warehouse(rd_src_schema,table_name,rd_dst_schema,host,port,database,user,password,date):
     """
-    Function to load data to DSDK Redshift
+    Function to load data to demo_warehouse
     """ 
-    #CREATE TABLE {final_redshift_schema}.{table_iceberg} AS
-    #SELECT * FROM {database_iceberg}.{table_iceberg} limit 0;
+    #CREATE TABLE {demo_destination_schema}.{table_iceberg} AS
+    #SELECT * FROM {demo_source_catalog}.{table_iceberg} limit 0;
 
     query2 = f"""
     INSERT INTO {rd_dst_schema}.{table_name}
