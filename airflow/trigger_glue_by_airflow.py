@@ -17,8 +17,8 @@ from airflow.models import Variable
 
 
 AWS_CONN_ID = 'aws_default'
-GLUE_ROLE = "arn:aws:iam::125876603273:role/service-role/ann32auds-auds-aue1-glue-service-role"
-dag_name = "1pd_under_armour"
+GLUE_ROLE = "test"
+dag_name = "dag_name"
 
 dag_vars = Variable.get(dag_name, deserialize_json=True)
 script_location=dag_vars['script_location']
@@ -46,7 +46,7 @@ GLUE_JOBS_CONFIG = [
         "job_name": "1pd_under_armour_job",
         "script_location": script_location,
         "default_args": {
-            "--TempDir": "s3://ann32auds-aue1-auds-datateam/tmp/",
+            "--TempDir": "s3://<bucket>/tmp/",
             "--enable-metrics": "",
             "--job-bookmark-option": "job-bookmark-enable",
             "--external_crossaccount_catalog_id": external_crossaccount_catalog_id,
