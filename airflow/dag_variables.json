@@ -3,7 +3,7 @@
         "access_emails": "user1@omc.com,user2@omc.com",
         "catalog": "glue_catalog",
         "cc_emails": "donot-reply@gmail.com",
-        "config_path": "s3://ann32auds-aue1-auds-datateam/scripts/ses_config/1pd_ses_common_config.cfg",
+        "config_path": "s3://<bucket>/scripts/ses_config/1pd_ses_common_config.cfg",
         "dataset": "<Client Name>",
         "external_crossaccount_catalog_id": "<dst_aws_acc_id>",
         "ice_dest_folder": "s3://<bucket>/<client-guid>/data/auds/bronze",
